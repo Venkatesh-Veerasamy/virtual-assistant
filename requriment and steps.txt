@@ -1,0 +1,190 @@
+
+# Project Setup
+
+## Step 1: Create a Virtual Environment
+To set up the project, first create a virtual environment using the following command:
+
+```bash
+python -m venv venv
+```
+
+Activate the virtual environment:
+
+- On macOS/Linux:
+```bash
+source venv/bin/activate
+```
+
+- On Windows:
+```bash
+venv\Scripts\activate
+```
+
+## Step 2: Install Required Dependencies
+You can install necessary dependencies such as Flask and SQLite3 if required:
+
+```bash
+pip install Flask sqlite3
+```
+
+# Database Setup
+
+## Step 3: Create SQLite Database and Users Table
+To create an SQLite database and the `users` table, use the following Python script:
+
+```python
+import sqlite3
+
+# Connect to the SQLite database
+conn = sqlite3.connect('users.db')
+c = conn.cursor()
+
+# Create 'users' table
+c.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT NOT NULL UNIQUE,
+        unique_key TEXT NOT NULL,
+        valid_from DATE NOT NULL,
+        expire_on DATE NOT NULL
+    )
+''')
+
+# Commit and close the connection
+conn.commit()
+conn.close()
+```
+
+## Step 4: Insert Test Data into the Database
+The following Python script is used to insert sample data into the `users` table:
+
+```python
+import sqlite3
+from datetime import datetime, timedelta
+
+# Connect to the database
+conn = sqlite3.connect('users.db')
+c = conn.cursor()
+
+users = [
+    {
+        'email': 'venkat@gmail.com',
+        'unique_key': '1234',
+        'valid_from': datetime.now().strftime('%Y-%m-%d'),
+        'expire_on': (datetime.now() + timedelta(days=4)).strftime('%Y-%m-%d')
+    },
+    {
+        'email': 'user2@example.com',
+        'unique_key': '5678',
+        'valid_from': datetime.now().strftime('%Y-%m-%d'),
+        'expire_on': (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
+    },
+    {
+        'email': 'expired_user@example.com',
+        'unique_key': '9999',
+        'valid_from': (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d'),
+        'expire_on': (datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d')  # Expired user
+    },
+    {
+        'email': 'user3@gmail.com',
+        'unique_key': '1122',
+        'valid_from': datetime.now().strftime('%Y-%m-%d'),
+        'expire_on': (datetime.now() + timedelta(days=5)).strftime('%Y-%m-%d')
+    },
+    {
+        'email': 'user4@gmail.com',
+        'unique_key': '3344',
+        'valid_from': datetime.now().strftime('%Y-%m-%d'),
+        'expire_on': (datetime.now() + timedelta(days=6)).strftime('%Y-%m-%d')
+    },
+    {
+        'email': 'user5@yahoo.com',
+        'unique_key': '5566',
+        'valid_from': datetime.now().strftime('%Y-%m-%d'),
+        'expire_on': (datetime.now() + timedelta(days=3)).strftime('%Y-%m-%d')
+    },
+    {
+        'email': 'user6@hotmail.com',
+        'unique_key': '7788',
+        'valid_from': datetime.now().strftime('%Y-%m-%d'),
+        'expire_on': (datetime.now() + timedelta(days=9)).strftime('%Y-%m-%d')
+    },
+    {
+        'email': 'user7@gmail.com',
+        'unique_key': '9911',
+        'valid_from': datetime.now().strftime('%Y-%m-%d'),
+        'expire_on': (datetime.now() + timedelta(days=10)).strftime('%Y-%m-%d')
+    },
+    {
+        'email': 'user8@example.com',
+        'unique_key': '1010',
+        'valid_from': datetime.now().strftime('%Y-%m-%d'),
+        'expire_on': (datetime.now() + timedelta(days=8)).strftime('%Y-%m-%d')
+    },
+    {
+        'email': 'user9@domain.com',
+        'unique_key': '2020',
+        'valid_from': datetime.now().strftime('%Y-%m-%d'),
+        'expire_on': (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')
+    }
+]
+
+# Insert users into the database
+for user in users:
+    c.execute('''
+        INSERT INTO users (email, unique_key, valid_from, expire_on)
+        VALUES (?, ?, ?, ?)
+    ''', (user['email'], user['unique_key'], user['valid_from'], user['expire_on']))
+
+# Commit and close the connection
+conn.commit()
+conn.close()
+
+print("Test data inserted successfully.")
+```
+
+### Step 5: Avoid Integrity Error for Duplicate Emails
+The following code snippet checks for existing emails and avoids duplicate insertion:
+
+```python
+for user in users:
+    # Check if the email already exists
+    c.execute("SELECT * FROM users WHERE email = ?", (user['email'],))
+    existing_user = c.fetchone()
+
+    if existing_user:
+        print(f"User with email '{user['email']}' already exists. Skipping insertion.")
+    else:
+        c.execute('''
+            INSERT INTO users (email, unique_key, valid_from, expire_on)
+            VALUES (?, ?, ?, ?)
+        ''', (user['email'], user['unique_key'], user['valid_from'], user['expire_on']))
+        print(f"User '{user['email']}' inserted successfully.")
+```
+
+### Step 6: Running the Script
+To insert the data into the database, execute the script from the terminal:
+
+```bash
+python insert_test_data.py
+```
+
+This script will insert users into the database while skipping any users with duplicate emails.
+
+# Commands Executed
+Here are the terminal commands executed from the start:
+
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+source venv/bin/activate  # (on macOS/Linux)
+
+# Install Flask and SQLite3 (if needed)
+pip install Flask sqlite3
+
+# Run Python scripts
+python create_db.py  # Create the database and table
+python insert_test_data.py  # Insert test data into the database
+```

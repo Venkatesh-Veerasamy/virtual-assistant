@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate License Key</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <main class="container">
+        <h1 class="title">Generate License Key</h1>
+        <section class="license-section">
+            <form id="licenseForm" action="/license" method="POST">
+                <div>
+                    <input type="text" name="unique_id" placeholder="Enter unique key ID..." required>
+                </div>
+                <div>
+                    <label for="valid_from">Valid From:</label>
+                    <input type="date" name="valid_from" required>
+                </div>
+                <div>
+                    <label for="expire_on">Expires On:</label>
+                    <input type="date" name="expire_on" required>
+                </div>
+                <br>
+                
+                <button type="submit" class="btn">Generate License</button>
+            </form>
+            <div id="license-response" class="response-box">
+                {% if response %}
+                    <h2>License Generated Successfully!</h2>
+                    <p><strong>License Key:</strong> {{ response.license_key }}</p>
+                    <p><strong>Email:</strong> {{ session.email }}</p>
+                    <p><strong>Unique Key ID:</strong> {{ response.unique_id }}</p>
+                    <p><strong>Valid From:</strong> {{ response.valid_from }}</p>
+                    <p><strong>Expires On:</strong> {{ response.expire_on }}</p>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
